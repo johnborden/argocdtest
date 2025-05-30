@@ -1,0 +1,24 @@
+Ran this to install argo:
+[root@ip-172-31-85-238 ~]# curl -sSL -o argocd-linux-amd64 https://github.com/argoproj/argo-cd/releases/latest/download/argocd-linux-amd64
+[root@ip-172-31-85-238 ~]# sudo install -m 555 argocd-linux-amd64 /usr/local/bin/argocd
+[root@ip-172-31-85-238 ~]# which argocd
+/usr/local/bin/argocd
+Setting up a repo to make changes:
+= [root@ip-172-31-85-238 argocdtest]# ssh-keygen -t rsa
+=   # Added this key to github, will remove it later
+= [root@ip-172-31-85-238 argocdtest]# git config --global --edit
+= [root@ip-172-31-85-238 ~]# git clone git@github.com:johnborden/argocdtest.git
+= [root@ip-172-31-85-238 argocdtest]# git add test.yaml
+= [root@ip-172-31-85-238 argocdtest]# git commit -m "Added a test file"
+= [root@ip-172-31-85-238 argocdtest]# kubectl create ns argons
+= namespace/argons created
+= [root@ip-172-31-85-238 argocdtest]# argocd app create app1 --repo https://github.com/johnborden/argocdtest.git \
+=     --path . --dest-server https://kubernetes.default.svc --dest-namespace argons
+= application 'app1' created
+= 
+= # Go into the argo user interface, choose applications and sync the app1 that was added.
+= 
+= [root@ip-172-31-85-238 argocdtest]# kubectl -n argons get pods
+= NAME                       READY   STATUS    RESTARTS   AGE
+= argodep-655fcc6479-b4zlz   1/1     Running   0          17s
+= argodep-655fcc6479-kj6b2   1/1     Running   0          17s
